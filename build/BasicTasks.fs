@@ -28,3 +28,21 @@ let build = BuildTask.create "Build" [clean] {
     solutionFile
     |> DotNet.build id
 }
+
+let buildFable = BuildTask.create "BuildFable" [clean] {
+    "src/FSharpAux/FSharpAux.fsproj"
+    |> DotNet.build (fun p -> 
+        let msBuildParams =
+            {p.MSBuildParams with 
+                Properties = ([
+                    "DefineConstants", "FABLE_COMPILER"
+                ] @ p.MSBuildParams.Properties)
+            }
+        {
+            p with 
+                MSBuildParams = msBuildParams
+                OutputPath = Some pkgDir
+        }
+    
+    )
+}
